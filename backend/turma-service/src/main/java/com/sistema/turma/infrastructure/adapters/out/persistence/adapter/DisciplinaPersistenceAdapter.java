@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.Optional;
 
-@Component // <-- É ISTO QUE RESOLVE O SEU ERRO!
+@Component
 @RequiredArgsConstructor
 public class DisciplinaPersistenceAdapter implements DisciplinaRepositoryPort {
 
@@ -18,12 +18,15 @@ public class DisciplinaPersistenceAdapter implements DisciplinaRepositoryPort {
 
     @Override
     public List<Disciplina> buscarTodos() {
-        return repository.findAll().stream().map(this::toDomain).toList();
+        return repository.findAll().stream()
+                .map(this::toDomain)
+                .toList();
     }
 
     @Override
     public Optional<Disciplina> buscarPorId(Long id) {
-        return repository.findById(id).map(this::toDomain);
+        return repository.findById(id)
+                .map(this::toDomain);
     }
 
     @Override

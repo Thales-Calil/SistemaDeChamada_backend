@@ -1,4 +1,4 @@
-package com.sistema.aluno.application.usecase;
+package com.sistema.aluno.application.usecase.service;
 
 import com.sistema.aluno.application.ports.in.GerenciarAlunoUseCase;
 import com.sistema.aluno.application.ports.out.AlunoRepositoryPort;
