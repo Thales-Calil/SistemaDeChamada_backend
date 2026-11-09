@@ -1,4 +1,4 @@
-package com.sistema.turma.application.usecase;
+package com.sistema.turma.application.usecase.service;
 
 import com.sistema.turma.application.ports.in.GerenciarTurmaUseCase;
 import com.sistema.turma.application.ports.out.DisciplinaRepositoryPort;

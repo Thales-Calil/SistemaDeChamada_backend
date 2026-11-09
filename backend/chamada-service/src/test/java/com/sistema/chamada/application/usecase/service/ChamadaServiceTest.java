@@ -1,7 +1,10 @@
 package com.sistema.chamada.application.usecase.service;
 
+import com.sistema.chamada.application.ports.out.ChamadaEventPublisherPort;
 import com.sistema.chamada.application.ports.out.ChamadaRepositoryPort;
+import com.sistema.chamada.domain.event.ChamadaFinalizadaEvent;
 import com.sistema.chamada.domain.model.Chamada;
+import com.sistema.chamada.domain.model.StatusChamada;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +25,9 @@ class ChamadaServiceTest {
     @Mock
     private ChamadaRepositoryPort chamadaRepositoryPort;
 
+    @Mock
+    private ChamadaEventPublisherPort chamadaEventPublisherPort; // Declaração da porta do evento como Mock
+
     @InjectMocks
     private ChamadaService chamadaService;
 
@@ -33,6 +39,7 @@ class ChamadaServiceTest {
         chamada.setId(1L);
         chamada.setTurmaId(10L);
         chamada.setData(LocalDate.now());
+        chamada.setStatus(StatusChamada.ABERTA);
     }
 
     @Test
@@ -55,5 +62,17 @@ class ChamadaServiceTest {
         assertThat(resultado).isNotNull();
         assertThat(resultado.getTurmaId()).isEqualTo(10L);
         verify(chamadaRepositoryPort, times(1)).buscarPorId(1L);
+    }
+
+    @Test
+    void deveFinalizarChamadaEPublicarEvento() {
+        when(chamadaRepositoryPort.buscarPorId(1L)).thenReturn(Optional.of(chamada));
+        when(chamadaRepositoryPort.salvar(any(Chamada.class))).thenReturn(chamada);
+        doNothing().when(chamadaEventPublisherPort).publicarChamadaFinalizada(any(ChamadaFinalizadaEvent.class));
+
+        chamadaService.finalizar(1L);
+
+        verify(chamadaRepositoryPort, times(1)).salvar(chamada);
+        verify(chamadaEventPublisherPort, times(1)).publicarChamadaFinalizada(any(ChamadaFinalizadaEvent.class));
     }
 }

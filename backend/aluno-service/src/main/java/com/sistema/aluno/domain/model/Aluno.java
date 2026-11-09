@@ -1,5 +1,6 @@
 package com.sistema.aluno.domain.model;
 
+
 import lombok.Data;
 
 @Data

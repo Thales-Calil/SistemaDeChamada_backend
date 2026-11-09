@@ -3,6 +3,7 @@ package com.sistema.turma.application.usecase;
 import com.sistema.turma.application.ports.out.DisciplinaRepositoryPort;
 import com.sistema.turma.application.ports.out.ProfessorRepositoryPort;
 import com.sistema.turma.application.ports.out.TurmaRepositoryPort;
+import com.sistema.turma.application.usecase.service.TurmaService;
 import com.sistema.turma.domain.model.Disciplina;
 import com.sistema.turma.domain.model.Professor;
 import com.sistema.turma.domain.model.Turma;

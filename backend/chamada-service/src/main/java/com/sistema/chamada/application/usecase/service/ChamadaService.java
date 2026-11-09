@@ -1,7 +1,9 @@
 package com.sistema.chamada.application.usecase.service;
 
 import com.sistema.chamada.application.ports.in.GerenciarChamadaUseCase;
+import com.sistema.chamada.application.ports.out.ChamadaEventPublisherPort;
 import com.sistema.chamada.application.ports.out.ChamadaRepositoryPort;
+import com.sistema.chamada.domain.event.ChamadaFinalizadaEvent;
 import com.sistema.chamada.domain.model.Chamada;
 import com.sistema.chamada.domain.model.StatusChamada;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import java.util.List;
 public class ChamadaService implements GerenciarChamadaUseCase {
 
     private final ChamadaRepositoryPort chamadaRepositoryPort;
+    private final ChamadaEventPublisherPort chamadaEventPublisherPort; // Porta de Saída do Evento
 
     @Override
     public Chamada criar(Chamada chamada) {
@@ -36,7 +39,16 @@ public class ChamadaService implements GerenciarChamadaUseCase {
     public void finalizar(Long id) {
         Chamada chamada = buscarPorId(id);
         chamada.setStatus(StatusChamada.FINALIZADA);
-        chamadaRepositoryPort.salvar(chamada);
+        Chamada chamadaSalva = chamadaRepositoryPort.salvar(chamada);
+
+        // Disparo assíncrono do evento de domínio via Porta Hexagonal
+        ChamadaFinalizadaEvent evento = new ChamadaFinalizadaEvent(
+                chamadaSalva.getId(),
+                chamadaSalva.getTurmaId(),
+                chamadaSalva.getData(),
+                chamadaSalva.getStatus().name()
+        );
+        chamadaEventPublisherPort.publicarChamadaFinalizada(evento);
     }
 
     @Override
