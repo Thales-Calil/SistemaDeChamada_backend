@@ -26,13 +26,12 @@ jobs:
 
       - name: Build with Maven
         run: mvn clean install
-        working-directory: backend/aluno-service
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          path: '${{ github.workspace }}/backend/aluno-service/target/*.jar'
+          path: '${{ github.workspace }}/target/*.jar'
 
   deploy:
     runs-on: ubuntu-latest
@@ -50,9 +49,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_6445BB15572F41C7AD4E6FE36A4FABD7 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_F859A4CED79E406DBD0D969F8E41098E }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_B4AFC55293154D25BD4DBEF636E623D1 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_A1932879E4EC4061A3755A0652053610 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C2D888F5E92B4B4C8B360EFD937A1F4E }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_5472E4957EFD49E38EC08F549C15260A }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
