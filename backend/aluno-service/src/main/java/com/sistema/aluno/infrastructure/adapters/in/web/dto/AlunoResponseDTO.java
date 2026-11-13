@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class AlunoResponseDTO {
 
-    private String id;
+    private Long id;
     private String nome;
     private String matricula;
     private String email;

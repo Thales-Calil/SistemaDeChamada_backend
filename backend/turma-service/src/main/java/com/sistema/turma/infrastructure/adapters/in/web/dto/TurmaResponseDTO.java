@@ -14,6 +14,7 @@ public class TurmaResponseDTO {
     private String professorNome;
     private Long disciplinaId;
     private String disciplinaNome;
+    private int aulasMinistradas;
 
     public TurmaResponseDTO(Turma turma) {
         this.id = turma.getId();
@@ -24,5 +25,7 @@ public class TurmaResponseDTO {
 
         this.disciplinaId = turma.getDisciplina().getId();
         this.disciplinaNome = turma.getDisciplina().getNome();
+
+        this.aulasMinistradas = turma.getAulasMinistradas();
     }
 }

@@ -1,5 +1,6 @@
 package com.sistema.turma.infrastructure.adapters.in.web.controller;
 
+import com.sistema.turma.application.ports.in.GerenciarMatriculaUseCase;
 import com.sistema.turma.application.ports.in.GerenciarTurmaUseCase;
 import com.sistema.turma.domain.model.Disciplina;
 import com.sistema.turma.domain.model.Professor;
@@ -20,11 +21,13 @@ class TurmaControllerTest {
 
     private MockMvc mockMvc;
     private GerenciarTurmaUseCase gerenciarTurmaUseCase;
+    private GerenciarMatriculaUseCase gerenciarMatriculaUseCase;
 
     @BeforeEach
     void setUp() {
         gerenciarTurmaUseCase = Mockito.mock(GerenciarTurmaUseCase.class);
-        TurmaController controller = new TurmaController(gerenciarTurmaUseCase);
+        gerenciarMatriculaUseCase = Mockito.mock(GerenciarMatriculaUseCase.class);
+        TurmaController controller = new TurmaController(gerenciarTurmaUseCase, gerenciarMatriculaUseCase);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -73,5 +76,15 @@ class TurmaControllerTest {
         mockMvc.perform(get("/api/turmas/{id}", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nome").value("Arquitetura de Soluções"));
+    }
+
+    @Test
+    void deveListarIdsDosAlunosDaTurma() throws Exception {
+        when(gerenciarMatriculaUseCase.listarAlunosDaTurma(1L)).thenReturn(java.util.List.of(42L, 43L));
+
+        mockMvc.perform(get("/api/turmas/{id}/alunos", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0]").value(42))
+                .andExpect(jsonPath("$[1]").value(43));
     }
 }

@@ -2,8 +2,11 @@ package com.sistema.aluno.infrastructure.adapters.out.persistence;
 
 import com.sistema.aluno.application.ports.out.AlunoRepositoryPort;
 import com.sistema.aluno.domain.model.Aluno;
-import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,35 +15,56 @@ import java.util.Optional;
 public class AlunoPersistenceAdapter implements AlunoRepositoryPort {
 
     private final SpringDataAlunoRepository repository;
+    private final SequenciaAlunoGenerator sequencia;
 
     @Override
     public List<Aluno> buscarTodos() {
-        return repository.findAll().stream().map(this::toDomain).toList();
+        return repository.findAll().stream().map(this::toDomain).sorted(Comparator.comparing(Aluno::getNome, Comparator.nullsLast(String::compareToIgnoreCase))).toList();
     }
 
     @Override
-    public Optional<Aluno> buscarPorId(String id) {
+    public List<Aluno> buscarPorIds(Collection<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return repository.findAllById(ids).stream().map(this::toDomain).sorted(Comparator.comparing(Aluno::getNome, Comparator.nullsLast(String::compareToIgnoreCase))).toList();
+    }
+
+    @Override
+    public Optional<Aluno> buscarPorId(Long id) {
         return repository.findById(id).map(this::toDomain);
     }
 
     @Override
-    public Aluno salvar(Aluno aluno) {
-        AlunoEntity entity = toEntity(aluno);
-        AlunoEntity savedEntity = repository.save(entity);
-        return toDomain(savedEntity);
+    public Optional<Aluno> buscarPorMatricula(String matricula) {
+        return repository.findFirstByMatricula(matricula).map(this::toDomain);
     }
 
     @Override
-    public void excluir(String id) {
+    public Optional<Aluno> buscarPorEmail(String email) {
+        return repository.findFirstByEmail(email).map(this::toDomain);
+    }
+
+    @Override
+    public Aluno salvar(Aluno aluno) {
+        return toDomain(repository.save(toEntity(aluno)));
+    }
+
+    @Override
+    public void excluir(Long id) {
         repository.deleteById(id);
     }
 
     @Override
-    public boolean existePorId(String id) {
+    public boolean existePorId(Long id) {
         return repository.existsById(id);
     }
 
-    // Métodos utilitários de mapeamento (Podem ser extraídos para uma classe Mapper)
+    @Override
+    public Long proximoId() {
+        return sequencia.proximo();
+    }
+
     private Aluno toDomain(AlunoEntity entity) {
         Aluno aluno = new Aluno();
         aluno.setId(entity.getId());

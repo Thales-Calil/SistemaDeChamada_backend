@@ -21,4 +21,7 @@ public class TurmaEntity {
     @ManyToOne
     @JoinColumn(name = "disciplina_id", nullable = false)
     private DisciplinaEntity disciplina;
+
+    @Column(name = "aulas_ministradas", nullable = false)
+    private int aulasMinistradas;
 }

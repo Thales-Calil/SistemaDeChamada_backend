@@ -12,4 +12,7 @@ public class Turma {
     private Professor professor;
 
     private Disciplina disciplina;
+
+    /** Quantidade de chamadas finalizadas (atualizada pelo evento ChamadaFinalizada do Service Bus). */
+    private int aulasMinistradas;
 }

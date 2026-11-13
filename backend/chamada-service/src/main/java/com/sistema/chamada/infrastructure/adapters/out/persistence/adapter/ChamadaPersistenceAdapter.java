@@ -7,6 +7,8 @@ import com.sistema.chamada.infrastructure.adapters.out.persistence.repository.Sp
 import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +31,12 @@ public class ChamadaPersistenceAdapter implements ChamadaRepositoryPort {
 
     @Override
     public List<Chamada> listarPorTurma(Long turmaId) {
-        return repository.findByTurmaId(turmaId).stream().map(this::toDomain).toList();
+        return repository.findByTurmaIdOrderByDataDescHorarioDesc(turmaId).stream().map(this::toDomain).toList();
+    }
+
+    @Override
+    public boolean existe(Long turmaId, LocalDate data, LocalTime horario) {
+        return repository.existsByTurmaIdAndDataAndHorario(turmaId, data, horario);
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.sistema.chamada.domain.model.Presenca;
 import com.sistema.chamada.infrastructure.adapters.out.persistence.entity.PresencaEntity;
 import com.sistema.chamada.infrastructure.adapters.out.persistence.repository.SpringDataPresencaRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -25,6 +26,17 @@ public class PresencaPersistenceAdapter implements PresencaRepositoryPort {
     @Override
     public Optional<Presenca> buscarPorChamadaEAluno(Long chamadaId, Long alunoId) {
         return repository.findByChamadaIdAndAlunoId(chamadaId, alunoId).map(this::toDomain);
+    }
+
+    @Override
+    public List<Presenca> buscarPorChamada(Long chamadaId) {
+        return repository.findByChamadaId(chamadaId).stream().map(this::toDomain).toList();
+    }
+
+    @Override
+    @Transactional
+    public void excluirPorChamada(Long chamadaId) {
+        repository.excluirPorChamada(chamadaId);
     }
 
     @Override

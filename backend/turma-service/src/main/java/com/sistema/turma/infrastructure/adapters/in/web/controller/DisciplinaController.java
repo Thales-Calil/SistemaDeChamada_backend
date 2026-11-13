@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/disciplinas")
-@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class DisciplinaController {
 

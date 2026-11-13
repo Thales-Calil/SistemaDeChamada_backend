@@ -1,13 +1,12 @@
 package com.sistema.aluno.domain.model;
 
-
 import lombok.Data;
 
 @Data
 public class Aluno {
 
-
-    private String id;
+    /** Id numérico (Long), igual em todos os microsserviços. Gerado por sequência no Cosmos DB. */
+    private Long id;
 
     private String nome;
 
