@@ -8,6 +8,9 @@ import org.junit.jupiter.api.Test;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
+/**
+ * Regras da Arquitetura Hexagonal do turma-service (turmas, matrículas, chamadas e presenças).
+ */
 class HexagonalArchitectureTest {
 
     private JavaClasses classesImportadas;
@@ -19,12 +22,33 @@ class HexagonalArchitectureTest {
                 .importPackages("com.sistema.turma");
     }
 
+    /** 1. O domínio (Turma, Chamada, Presenca, cálculo de frequência) é puro: sem Spring, JPA ou infraestrutura. */
     @Test
     void dominioNaoDeveDependerDaInfraestruturaNemDoSpring() {
         noClasses()
                 .that().resideInAPackage("..domain..")
                 .should().dependOnClassesThat()
-                .resideInAnyPackage("..infrastructure..", "org.springframework..")
+                .resideInAnyPackage("..infrastructure..", "..application..", "org.springframework..", "jakarta.persistence..")
+                .check(classesImportadas);
+    }
+
+    /** 2. Os casos de uso só falam com o mundo externo por portas (ports.out), nunca pelos adaptadores. */
+    @Test
+    void aplicacaoNaoDeveDependerDosAdaptadores() {
+        noClasses()
+                .that().resideInAPackage("..application..")
+                .should().dependOnClassesThat()
+                .resideInAPackage("..infrastructure..")
+                .check(classesImportadas);
+    }
+
+    /** 3. Controllers (entrada) não acessam persistência, HTTP nem mensageria (saída) diretamente. */
+    @Test
+    void adaptadoresDeEntradaNaoDevemUsarAdaptadoresDeSaida() {
+        noClasses()
+                .that().resideInAPackage("..infrastructure.adapters.in..")
+                .should().dependOnClassesThat()
+                .resideInAPackage("..infrastructure.adapters.out..")
                 .check(classesImportadas);
     }
 }

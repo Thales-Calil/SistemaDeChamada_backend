@@ -3,13 +3,11 @@ package com.sistema.turma.domain.event;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChamadaFinalizadaEvent {
@@ -18,4 +16,12 @@ public class ChamadaFinalizadaEvent {
     private LocalDate data;
     private String status;
     private LocalDateTime dataHoraProcessamento;
+
+    public ChamadaFinalizadaEvent(Long chamadaId, Long turmaId, LocalDate data, String status) {
+        this.chamadaId = chamadaId;
+        this.turmaId = turmaId;
+        this.data = data;
+        this.status = status;
+        this.dataHoraProcessamento = LocalDateTime.now();
+    }
 }

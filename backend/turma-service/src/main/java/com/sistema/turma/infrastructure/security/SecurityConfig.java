@@ -3,6 +3,7 @@ package com.sistema.turma.infrastructure.security;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,7 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
- * Segurança do microsserviço (defesa em profundidade): toda requisição precisa do JWT
+ * Segurança do turma-service (turmas, matrículas, chamadas e presenças) - defesa em profundidade: toda requisição precisa do JWT
  * emitido pelo API Gateway (mesmo JWT_SECRET). Assim, mesmo chamando a URL
  * *.azurewebsites.net direto, sem passar pelo Gateway, ninguém acessa os dados sem token válido.
  */
@@ -50,6 +51,27 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/error").permitAll()
+
+                        // ALUNO: só leitura dos próprios dados (o caso de uso confere se {id} é o dele)
+                        .requestMatchers(HttpMethod.GET, "/api/turmas/aluno/*", "/api/presencas/aluno/*")
+                                .hasAnyRole("ADMIN", "PROFESSOR", "ALUNO")
+                        .requestMatchers(HttpMethod.GET, "/api/turmas", "/api/turmas/*")
+                                .hasAnyRole("ADMIN", "PROFESSOR", "ALUNO")
+
+                        // Chamadas e presenças: ADMIN e PROFESSOR (professor só nas próprias turmas, conferido no caso de uso)
+                        .requestMatchers("/api/chamadas", "/api/chamadas/**", "/api/presencas/**")
+                                .hasAnyRole("ADMIN", "PROFESSOR")
+
+                        // Leituras de apoio: alunos da turma, alunos do professor, professores e disciplinas
+                        .requestMatchers(HttpMethod.GET, "/api/turmas/**", "/api/professores", "/api/professores/**",
+                                "/api/disciplinas", "/api/disciplinas/**")
+                                .hasAnyRole("ADMIN", "PROFESSOR")
+
+                        // Cadastros e matrículas: somente ADMIN
+                        .requestMatchers("/api/turmas", "/api/turmas/**", "/api/professores", "/api/professores/**",
+                                "/api/disciplinas", "/api/disciplinas/**")
+                                .hasRole("ADMIN")
+
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth
                         .jwt(jwt -> jwt

@@ -4,7 +4,7 @@ import com.sistema.turma.application.exception.AcessoNegadoException;
 import com.sistema.turma.application.exception.NaoEncontradoException;
 import com.sistema.turma.application.exception.RegraNegocioException;
 import com.sistema.turma.application.ports.in.GerenciarTurmaUseCase;
-import com.sistema.turma.application.ports.out.ChamadaServicePort;
+import com.sistema.turma.application.ports.out.ChamadaRepositoryPort;
 import com.sistema.turma.application.ports.out.DisciplinaRepositoryPort;
 import com.sistema.turma.application.ports.out.MatriculaRepositoryPort;
 import com.sistema.turma.application.ports.out.ProfessorRepositoryPort;
@@ -28,7 +28,7 @@ public class TurmaService implements GerenciarTurmaUseCase {
     private final ProfessorRepositoryPort professorRepositoryPort;
     private final DisciplinaRepositoryPort disciplinaRepositoryPort;
     private final MatriculaRepositoryPort matriculaRepositoryPort;
-    private final ChamadaServicePort chamadaServicePort;
+    private final ChamadaRepositoryPort chamadaRepositoryPort;
     private final UsuarioLogadoPort usuarioLogadoPort;
 
     @Override
@@ -76,8 +76,8 @@ public class TurmaService implements GerenciarTurmaUseCase {
         if (!turmaRepositoryPort.existePorId(id)) {
             throw new NaoEncontradoException("Turma " + id + " não encontrada.");
         }
-        // 2.7: integridade entre serviços - não deixa chamadas órfãs no chamada-service
-        if (chamadaServicePort.turmaPossuiChamadas(id)) {
+        // Integridade: turma com chamadas não pode ser excluída (também garantido por FK no banco)
+        if (chamadaRepositoryPort.existePorTurma(id)) {
             throw new RegraNegocioException("A turma " + id + " possui chamadas registradas e não pode ser excluída.");
         }
         matriculaRepositoryPort.excluirPorTurma(id);
